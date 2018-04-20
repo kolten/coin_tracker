@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:async';
 import 'package:coin_tracker/Classes/coin.dart';
 import 'package:flutter/material.dart';
 
@@ -44,17 +47,46 @@ class CoinList extends StatefulWidget {
 }
 
 class _CoinListState extends State<CoinList> {
+  // Create a Stream controller
+  // Streams allow us to make requests as we need data, lazily
+  StreamController<Coin> streamController;
   // Create a list of Coins, similar to Python, just with types!
   List<Coin> coins = [];
   // set our initial state
   @override
-  void initState() {
-      // TODO: implement initState
-      super.initState();
-      
-      // Dummy data for the moment
-      coins.add(new Coin(id: "1", name: "Bitcoin", symbol:"BTC", price: 0.001));
-    }
+  void initState(){
+    super.initState();
+
+    streamController = StreamController.broadcast();
+    // Subscribe
+    // Pass in an anonymous function
+    // Which gives us a callback like
+    // functionality when we receive an object
+    // back from the endpoint
+    streamController.stream.listen((coin) => 
+      setState(() => coins.add(coin))
+    );
+
+    // Make the api call to CoinMarketCap
+    load(streamController);
+  }
+
+  // https://github.com/tensor-programming/flutter_streams
+  load(StreamController controller) async {
+    String apiUrl = 'https://api.coinmarketcap.com/v1/ticker';
+    var client = http.Client();
+
+    var request = new http.Request('get', Uri.parse(apiUrl));
+    var res = await client.send(request);
+
+    // We "pipe" the data as we recieve it to the stream controller
+    res.stream
+    .transform(utf8.decoder)
+    .transform(json.decoder)
+    .expand((e) => e)
+    .map((map) => Coin.fromJson(map))
+    .pipe(streamController);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +105,6 @@ class _CoinListState extends State<CoinList> {
       ),
     );
   }
-
 
   Widget _buildTile(BuildContext context, int index){
     // Check if the index is large than or equal to the list size
