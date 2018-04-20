@@ -123,7 +123,7 @@ class _CoinListState extends State<CoinList> {
   _leadingWidget(String symbol){
     return new CircleAvatar(
       backgroundColor: Colors.blue,
-      child: new Text(symbol[0]),
+      child: new Text(symbol[0], style: new TextStyle(color: Colors.white))
     );
   }
 }
