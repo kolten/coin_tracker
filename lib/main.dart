@@ -117,6 +117,18 @@ class _CoinListState extends State<CoinList> {
       title: new Text(coins[index].name),
       subtitle: new Text(coins[index].price.toString()),
       isThreeLine: true,
+      onTap: (){
+        // Push to a new page on pressing the tile
+        Navigator.of(context).push(new MaterialPageRoute(
+          builder: (BuildContext) {
+            return new Scaffold(
+              appBar: new AppBar(
+                    title: new Text(coins[index].name),
+              ),
+            );
+          }
+        ));
+      },
     );
   }
 
