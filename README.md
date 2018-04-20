@@ -1,6 +1,6 @@
-# coin_tracker
+# Coin Tracker
 
-A new Flutter project.
+A new Flutter cryptocurrency price app.
 
 ## Getting Started
 
